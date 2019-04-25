@@ -1,0 +1,165 @@
+body{
+    position: relative;
+    height:100vh;
+    margin: 0;
+}
+
+#userArea{
+    height: 40%;
+    width: 100%;
+    float: left;
+    position: relative;
+}
+
+#chartArea{
+    height: 60%;
+    width: 100%;
+    float: left;
+    position: relative;
+
+    #mdInputFromDate{
+        left: 50px;
+        top: 40px;
+        position: absolute;
+    }
+
+    #mdInputToDate{
+        left: 350px;
+        top: 40px;
+        position: absolute;
+    }
+
+    #chartWrapper{
+        z-index: 1;
+        width: 100%;
+        height: 100%;
+        float: left;
+        position: relative;
+        overflow-x: auto;
+
+        #myChart{
+            float: left;
+            position: relative;
+        }
+    }
+}
+
+//http://jsfiddle.net/y9ag1bhx/48/
+
+#submitButton{ 
+    z-index: 10;
+    left: 650px;
+    top: 40px;
+    position: absolute;
+    padding: 1em 0;
+    width: 150px; 
+    cursor: pointer;
+    border: 0; 
+    color: #fff; 
+    background: #22A7F0;
+    -webkit-transition: all .5s;-moz-transition: all .5s;transition: all .5s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+#submitButton:hover{ 
+    background: #62c0f4;
+    overflow: hidden;
+}
+
+//https://jsfiddle.net/Yunnigg/xcf40uzm/
+
+div.mdInput {
+    z-index: 10;
+    position: relative;
+    float: left;
+    width: 250px;
+  }
+  
+  div.mdInput.full {
+    width: 100%;
+  }
+  
+  div.mdInput input,
+  div.mdInput textarea {
+    display: block;
+    padding: 1em 0.3em;
+    width: 100%;
+    border: none;
+    border-bottom: 0.2em solid #000000;
+  }
+  
+  div.mdInput input:focus,
+  div.mdInput textarea:focus {
+    outline: none;
+  }
+  
+  div.mdInput label {
+    position: absolute;
+    color: #9E9E9E;
+    left: 0.8em;
+    top: 1em;
+    transition: 0.2s ease-in-out all;
+    -moz-transition: 0.2s ease-in-out all;
+    -webkit-transition: 0.2s ease-in-out all;
+  }
+  
+  div.mdInput input:focus ~ label,
+  div.mdInput textarea:focus ~ label {
+    left: 0.5em;
+    top: -1.2em;
+    color: #FF5722;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+  
+  div.mdInput input:valid ~ label,
+  div.mdInput textarea:valid ~ label {
+    left: 0.5em;
+    top: -1.2em;
+    color: #4CAF50;
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+  
+  div.mdInput span {
+    display: block;
+    position: relative;
+  }
+  
+  div.mdInput span:before,
+  div.mdInput span:after,
+  div.mdInput textarea:before,
+  div.mdInput textarea:after {
+    position: absolute;
+    bottom: 0.01em;
+    height: 0.2em;
+    width: 0;
+    background: #FF5722;
+    content: '';
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+  }
+  
+  div.mdInput span:before {
+    left: 50%;
+  }
+  
+  div.mdInput span:after {
+    right: 50%;
+  }
+  
+  div.mdInput input:focus ~ span:before,
+  div.mdInput input:focus ~ span:after,
+  div.mdInput textarea:focus ~ span:before,
+  div.mdInput textarea:focus ~ span:after {
+    width: 50%;
+  }
+  
+  div.mdInput input:valid ~ span:before,
+  div.mdInput input:valid ~ span:after,
+  div.mdInput textarea:valid ~ span:before,
+  div.mdInput textarea:valid ~ span:after {
+    width: 50%;
+    background-color: #4CAF50;
+  }
+  

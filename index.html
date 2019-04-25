@@ -2,11 +2,32 @@
 <html>
 	<head>
 		<title>Stackoverflow Stats</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
 		<script type="text/javascript" src="external/StackOverflowManager.js"></script>
+		<script type="text/javascript" src="external/ChartManager.js"></script>
 		<script type="text/javascript" src="index.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 	</head>
 	<body>
-		
+		<div id="userArea">
+
+		</div>
+		<div id="chartArea">
+			<div class="mdInput" id="mdInputFromDate">
+				<input id="fromDate" name="fromDate" type="text" required>
+				<span></span>
+				<label for="fromDate">From Date</label>
+			</div>
+			<div class="mdInput" id="mdInputToDate">
+				<input id="toDate" name="toDate" type="text" required>
+				<span></span>
+				<label for="toDate">To Date</label>
+			</div>
+            <button id="submitButton" onclick="updateChart()">Update Chart</button>
+			<div id="chartWrapper">
+				<canvas id="myChart" height="60%"></canvas>
+			</div>
+		</div>
 	</body>
 </html>

@@ -2,6 +2,9 @@ class User {
 	public userName: string = ""
 	public stackoverflowUserObject: IStackoverflowUser = null
 	public stackoverflowAnswers: IAnswer[] = null
+	public stackoverflowStats: IStat[] = null
+	public viableStackoverflowAnswers: IAnswer[] = null
+	public viableStackoverflowStats: IStat[] = null
 	public calculatedPoints: number
 
 	constructor (_userName: string) {
@@ -10,18 +13,28 @@ class User {
 }
 
 class UserManager {
-	private static challangeStartDate: Date = new Date('2019-03-30T00:00:00')
+	public static challangeStartDate: Date = new Date('2019-03-30T00:00:00')
 
 	public static async loadFullUserObj(user: User): Promise<User> {
 		return new Promise<User>(async (resolve, reject) => {
 			try {
+				// Load the stackoverflow user object
 				user.stackoverflowUserObject = await UserManager.getStackoverflowUser(user)
 					
-				user.stackoverflowAnswers = await UserManager.getAnswersAfterDate(
-					await UserManager.getAnswersOfUser(user.stackoverflowUserObject), UserManager.challangeStartDate)
+				// Get all answers of the user
+				user.stackoverflowAnswers = await UserManager.getAnswersOfUser(user.stackoverflowUserObject)
+
+				// Get all the reputation changes of the user
+				user.stackoverflowStats = await UserManager.getStatsOfUser(user.stackoverflowUserObject)
 	
+				user.viableStackoverflowAnswers = await UserManager.getAnswersAfterDate(user.stackoverflowAnswers, UserManager.challangeStartDate)
+
+				// Get all the stats that are viable for the challenge
+				user.viableStackoverflowStats = await UserManager.getStatsRelatedToAnswers(
+					user.viableStackoverflowAnswers, user.stackoverflowStats)
+
 				user.calculatedPoints = await UserManager.calculatePointsOfUser(user)
-	
+				
 				resolve(user)
 			}catch(exception) {
 				reject(exception)
@@ -29,14 +42,25 @@ class UserManager {
 		})
 
 	}
+	static getStatsRelatedToAnswers(answers: IAnswer[], stats: IStat[]): Promise<IStat[]> {
+		return new Promise<IStat[]> ((resolve, reject) => {
+			let tempStats: IStat[] = []
+
+			stats.forEach(stat => {
+				if(answers.map(a => a.answer_id).indexOf(stat.post_id) !== -1)
+					tempStats.push(stat)
+			})
+
+			resolve(tempStats)
+		})
+	}
 
 	public static async calculatePointsOfUser(user: User): Promise<number> {
 		return new Promise<number> (async (resolve, reject) => {
 			let points: number = 0
 
-			user.stackoverflowAnswers.forEach((answer: IAnswer) => {
-				points += answer.is_accepted? 15:0
-				points += answer.score * 10
+			user.viableStackoverflowStats.forEach((stat: IStat) => {
+				points+=stat.reputation_change
 			})
 
 			resolve(points)
@@ -62,8 +86,9 @@ class UserManager {
 					reject(msg)
 				},
 				success: (data) => {
+					if(data.backoff != undefined)
+						UserManager.sleepBecauseStackoverflowLimits(data.backoff)
 					resolve(data.items)
-					UserManager.sleepBecauseStackoverflowLimits(data.backoff)
 				},
 				type: 'GET'
 			})
@@ -88,8 +113,9 @@ class UserManager {
 					reject(msg)
 				},
 				success: (data) => {
+					if(data.backoff != undefined)
+						UserManager.sleepBecauseStackoverflowLimits(data.backoff)
 					resolve(data.items)
-					UserManager.sleepBecauseStackoverflowLimits(data.backoff)
 				},
 				type: 'GET'
 			})
@@ -105,8 +131,9 @@ class UserManager {
 					reject(msg)
 				},
 				success: (data) => {
+					if(data.backoff != undefined)
+						UserManager.sleepBecauseStackoverflowLimits(data.backoff)
 					resolve(data.items[0]) // Unwrap user
-					UserManager.sleepBecauseStackoverflowLimits(data.backoff)
 				},
 				type: 'GET'
 			})

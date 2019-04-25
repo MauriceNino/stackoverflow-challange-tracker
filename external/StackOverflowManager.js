@@ -39,6 +39,9 @@ var User = /** @class */ (function () {
         this.userName = "";
         this.stackoverflowUserObject = null;
         this.stackoverflowAnswers = null;
+        this.stackoverflowStats = null;
+        this.viableStackoverflowAnswers = null;
+        this.viableStackoverflowStats = null;
         this.userName = _userName;
     }
     return User;
@@ -51,36 +54,70 @@ var UserManager = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var _a, _b, _c, _d, _e, exception_1;
-                        return __generator(this, function (_f) {
-                            switch (_f.label) {
+                        var _a, _b, _c, _d, _e, _f, exception_1;
+                        return __generator(this, function (_g) {
+                            switch (_g.label) {
                                 case 0:
-                                    _f.trys.push([0, 5, , 6]);
+                                    _g.trys.push([0, 7, , 8]);
+                                    // Load the stackoverflow user object
                                     _a = user;
-                                    return [4 /*yield*/, UserManager.getStackoverflowUser(user)];
+                                    return [4 /*yield*/, UserManager.getStackoverflowUser(user)
+                                        // Get all answers of the user
+                                    ];
                                 case 1:
-                                    _a.stackoverflowUserObject = _f.sent();
+                                    // Load the stackoverflow user object
+                                    _a.stackoverflowUserObject = _g.sent();
+                                    // Get all answers of the user
                                     _b = user;
-                                    _d = (_c = UserManager).getAnswersAfterDate;
-                                    return [4 /*yield*/, UserManager.getAnswersOfUser(user.stackoverflowUserObject)];
-                                case 2: return [4 /*yield*/, _d.apply(_c, [_f.sent(), UserManager.challangeStartDate])];
+                                    return [4 /*yield*/, UserManager.getAnswersOfUser(user.stackoverflowUserObject)
+                                        // Get all the reputation changes of the user
+                                    ];
+                                case 2:
+                                    // Get all answers of the user
+                                    _b.stackoverflowAnswers = _g.sent();
+                                    // Get all the reputation changes of the user
+                                    _c = user;
+                                    return [4 /*yield*/, UserManager.getStatsOfUser(user.stackoverflowUserObject)];
                                 case 3:
-                                    _b.stackoverflowAnswers = _f.sent();
-                                    _e = user;
-                                    return [4 /*yield*/, UserManager.calculatePointsOfUser(user)];
+                                    // Get all the reputation changes of the user
+                                    _c.stackoverflowStats = _g.sent();
+                                    _d = user;
+                                    return [4 /*yield*/, UserManager.getAnswersAfterDate(user.stackoverflowAnswers, UserManager.challangeStartDate)
+                                        // Get all the stats that are viable for the challenge
+                                    ];
                                 case 4:
-                                    _e.calculatedPoints = _f.sent();
-                                    resolve(user);
-                                    return [3 /*break*/, 6];
+                                    _d.viableStackoverflowAnswers = _g.sent();
+                                    // Get all the stats that are viable for the challenge
+                                    _e = user;
+                                    return [4 /*yield*/, UserManager.getStatsRelatedToAnswers(user.viableStackoverflowAnswers, user.stackoverflowStats)];
                                 case 5:
-                                    exception_1 = _f.sent();
+                                    // Get all the stats that are viable for the challenge
+                                    _e.viableStackoverflowStats = _g.sent();
+                                    _f = user;
+                                    return [4 /*yield*/, UserManager.calculatePointsOfUser(user)];
+                                case 6:
+                                    _f.calculatedPoints = _g.sent();
+                                    resolve(user);
+                                    return [3 /*break*/, 8];
+                                case 7:
+                                    exception_1 = _g.sent();
                                     reject(exception_1);
-                                    return [3 /*break*/, 6];
-                                case 6: return [2 /*return*/];
+                                    return [3 /*break*/, 8];
+                                case 8: return [2 /*return*/];
                             }
                         });
                     }); })];
             });
+        });
+    };
+    UserManager.getStatsRelatedToAnswers = function (answers, stats) {
+        return new Promise(function (resolve, reject) {
+            var tempStats = [];
+            stats.forEach(function (stat) {
+                if (answers.map(function (a) { return a.answer_id; }).indexOf(stat.post_id) !== -1)
+                    tempStats.push(stat);
+            });
+            resolve(tempStats);
         });
     };
     UserManager.calculatePointsOfUser = function (user) {
@@ -91,9 +128,8 @@ var UserManager = /** @class */ (function () {
                         var points;
                         return __generator(this, function (_a) {
                             points = 0;
-                            user.stackoverflowAnswers.forEach(function (answer) {
-                                points += answer.is_accepted ? 15 : 0;
-                                points += answer.score * 10;
+                            user.viableStackoverflowStats.forEach(function (stat) {
+                                points += stat.reputation_change;
                             });
                             resolve(points);
                             return [2 /*return*/];
@@ -124,8 +160,9 @@ var UserManager = /** @class */ (function () {
                                 reject(msg);
                             },
                             success: function (data) {
+                                if (data.backoff != undefined)
+                                    UserManager.sleepBecauseStackoverflowLimits(data.backoff);
                                 resolve(data.items);
-                                UserManager.sleepBecauseStackoverflowLimits(data.backoff);
                             },
                             type: 'GET'
                         });
@@ -155,8 +192,9 @@ var UserManager = /** @class */ (function () {
                                 reject(msg);
                             },
                             success: function (data) {
+                                if (data.backoff != undefined)
+                                    UserManager.sleepBecauseStackoverflowLimits(data.backoff);
                                 resolve(data.items);
-                                UserManager.sleepBecauseStackoverflowLimits(data.backoff);
                             },
                             type: 'GET'
                         });
@@ -174,8 +212,9 @@ var UserManager = /** @class */ (function () {
                                 reject(msg);
                             },
                             success: function (data) {
+                                if (data.backoff != undefined)
+                                    UserManager.sleepBecauseStackoverflowLimits(data.backoff);
                                 resolve(data.items[0]); // Unwrap user
-                                UserManager.sleepBecauseStackoverflowLimits(data.backoff);
                             },
                             type: 'GET'
                         });
