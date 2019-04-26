@@ -32,7 +32,7 @@ class ChartManager {
             dataSet.data.splice(insertIndex, 1, sum)
         })
         if(isNaN(dataSet.data[0]))
-            dataSet.data.splice(0, 1, dataSet.data.find((fdat: number) => !isNaN(fdat)))
+            dataSet.data.splice(0, 1, 0)
 
         if(isNaN(dataSet.data[dataSet.data.length-1]))
             dataSet.data.splice(dataSet.data.length-1, 1, dataSet.data.slice().reverse().find((fdat: number) => !isNaN(fdat)))

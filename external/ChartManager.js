@@ -27,7 +27,7 @@ var ChartManager = /** @class */ (function () {
             dataSet.data.splice(insertIndex, 1, sum);
         });
         if (isNaN(dataSet.data[0]))
-            dataSet.data.splice(0, 1, dataSet.data.find(function (fdat) { return !isNaN(fdat); }));
+            dataSet.data.splice(0, 1, 0);
         if (isNaN(dataSet.data[dataSet.data.length - 1]))
             dataSet.data.splice(dataSet.data.length - 1, 1, dataSet.data.slice().reverse().find(function (fdat) { return !isNaN(fdat); }));
         this.chart.data.datasets.push(dataSet);

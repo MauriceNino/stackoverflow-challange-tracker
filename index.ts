@@ -3,7 +3,8 @@ let users: User[] = [
     new User("MauriceNino"),
     new User("Thomas Herzog"),
     new User("Erhard Siegl"),
-    new User("Wirnse")
+    new User("Wirnse"),
+    new User("patrick.holzer")
 ]
 
 $(document).ready(() => { 

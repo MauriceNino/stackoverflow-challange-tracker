@@ -1,0 +1,26 @@
+{
+  "requires": true,
+  "lockfileVersion": 1,
+  "dependencies": {
+    "@types/chart.js": "^2.7.52",
+    "@types/jquery": "^3.3.29",
+    "typescript": "^3.4.5"
+  },
+  "name": "stackoverflowchallengetracker",
+  "description": "A Tracker for the Stackoverflow Challenge taking place in the company Gepardec",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MauriceNino/StackoverflowChallengeTracker.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MauriceNino/StackoverflowChallengeTracker/issues"
+  },
+  "homepage": "https://github.com/MauriceNino/StackoverflowChallengeTracker#readme"
+}
