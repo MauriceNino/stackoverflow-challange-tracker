@@ -22,10 +22,10 @@ class UserManager {
 				user.stackoverflowUserObject = await UserManager.getStackoverflowUser(user)
 					
 				// Get all answers of the user
-				user.stackoverflowAnswers = await UserManager.getAnswersOfUser(user.stackoverflowUserObject)
+				user.stackoverflowAnswers = await UserManager.getAnswersOfUser(user.stackoverflowUserObject, 1)
 
 				// Get all the reputation changes of the user
-				user.stackoverflowStats = await UserManager.getStatsOfUser(user.stackoverflowUserObject)
+				user.stackoverflowStats = await UserManager.getStatsOfUser(user.stackoverflowUserObject, 1)
 	
 				user.viableStackoverflowAnswers = await UserManager.getAnswersAfterDate(user.stackoverflowAnswers, UserManager.challangeStartDate)
 
@@ -75,11 +75,11 @@ class UserManager {
 		})
 	}
 	
-	public static async getStatsOfUser (stackoverflowUserObject: IStackoverflowUser): Promise<IStat[]> {
+	public static async getStatsOfUser (stackoverflowUserObject: IStackoverflowUser, page: number): Promise<IStat[]> {
 		return new Promise<IStat[]> ((resolve, reject) => {
 			if(stackoverflowUserObject == undefined) reject()
 				
-			$.ajax(`https://api.stackexchange.com/2.2/users/${stackoverflowUserObject.user_id}/reputation?site=stackoverflow`,
+			$.ajax(`https://api.stackexchange.com/2.2/users/${stackoverflowUserObject.user_id}/reputation?page=${page}&pagesize=100&site=stackoverflow`,
 			{
 				dataType: 'json',
 				error: (msg) => {
@@ -102,11 +102,11 @@ class UserManager {
 		})
 	}
 
-	public static async getAnswersOfUser (stackoverflowUserObject: IStackoverflowUser): Promise<IAnswer[]> {
+	public static async getAnswersOfUser (stackoverflowUserObject: IStackoverflowUser, page: number): Promise<IAnswer[]> {
 		return new Promise<IAnswer[]> ((resolve, reject) => {
 			if(stackoverflowUserObject == undefined) reject()
 				
-			$.ajax(`https://api.stackexchange.com/2.2/users/${stackoverflowUserObject.user_id}/answers?order=desc&sort=creation&site=stackoverflow`,
+			$.ajax(`https://api.stackexchange.com/2.2/users/${stackoverflowUserObject.user_id}/answers?page=${page}&pagesize=100&order=desc&sort=creation&site=stackoverflow`,
 			{
 				dataType: 'json',
 				error: (msg) => {
@@ -115,7 +115,9 @@ class UserManager {
 				success: (data) => {
 					if(data.backoff != undefined)
 						UserManager.sleepBecauseStackoverflowLimits(data.backoff)
-					resolve(data.items)
+					/*if(data.has_more)
+						data.items = data.items.concat(await this.getAnswersOfUser(stackoverflowUserObject, page + 1));*/
+					return resolve(data.items);
 				},
 				type: 'GET'
 			})

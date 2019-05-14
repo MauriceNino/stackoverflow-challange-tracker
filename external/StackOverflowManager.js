@@ -69,7 +69,7 @@ var UserManager = /** @class */ (function () {
                                     _a.stackoverflowUserObject = _g.sent();
                                     // Get all answers of the user
                                     _b = user;
-                                    return [4 /*yield*/, UserManager.getAnswersOfUser(user.stackoverflowUserObject)
+                                    return [4 /*yield*/, UserManager.getAnswersOfUser(user.stackoverflowUserObject, 1)
                                         // Get all the reputation changes of the user
                                     ];
                                 case 2:
@@ -77,7 +77,7 @@ var UserManager = /** @class */ (function () {
                                     _b.stackoverflowAnswers = _g.sent();
                                     // Get all the reputation changes of the user
                                     _c = user;
-                                    return [4 /*yield*/, UserManager.getStatsOfUser(user.stackoverflowUserObject)];
+                                    return [4 /*yield*/, UserManager.getStatsOfUser(user.stackoverflowUserObject, 1)];
                                 case 3:
                                     // Get all the reputation changes of the user
                                     _c.stackoverflowStats = _g.sent();
@@ -148,13 +148,13 @@ var UserManager = /** @class */ (function () {
             });
         });
     };
-    UserManager.getStatsOfUser = function (stackoverflowUserObject) {
+    UserManager.getStatsOfUser = function (stackoverflowUserObject, page) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         if (stackoverflowUserObject == undefined)
                             reject();
-                        $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/reputation?site=stackoverflow", {
+                        $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/reputation?page=" + page + "&pagesize=100&site=stackoverflow", {
                             dataType: 'json',
                             error: function (msg) {
                                 reject(msg);
@@ -180,13 +180,13 @@ var UserManager = /** @class */ (function () {
             });
         });
     };
-    UserManager.getAnswersOfUser = function (stackoverflowUserObject) {
+    UserManager.getAnswersOfUser = function (stackoverflowUserObject, page) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) {
                         if (stackoverflowUserObject == undefined)
                             reject();
-                        $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/answers?order=desc&sort=creation&site=stackoverflow", {
+                        $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/answers?page=" + page + "&pagesize=100&order=desc&sort=creation&site=stackoverflow", {
                             dataType: 'json',
                             error: function (msg) {
                                 reject(msg);
@@ -194,7 +194,9 @@ var UserManager = /** @class */ (function () {
                             success: function (data) {
                                 if (data.backoff != undefined)
                                     UserManager.sleepBecauseStackoverflowLimits(data.backoff);
-                                resolve(data.items);
+                                /*if(data.has_more)
+                                    data.items = data.items.concat(await this.getAnswersOfUser(stackoverflowUserObject, page + 1));*/
+                                return resolve(data.items);
                             },
                             type: 'GET'
                         });
