@@ -54,11 +54,11 @@ var UserManager = /** @class */ (function () {
             var _this = this;
             return __generator(this, function (_a) {
                 return [2 /*return*/, new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                        var _a, _b, _c, _d, _e, _f, exception_1;
-                        return __generator(this, function (_g) {
-                            switch (_g.label) {
+                        var _a, _b, _c, _d, _e, _f, _g, exception_1;
+                        return __generator(this, function (_h) {
+                            switch (_h.label) {
                                 case 0:
-                                    _g.trys.push([0, 7, , 8]);
+                                    _h.trys.push([0, 8, , 9]);
                                     // Load the stackoverflow user object
                                     _a = user;
                                     return [4 /*yield*/, UserManager.getStackoverflowUser(user)
@@ -66,7 +66,7 @@ var UserManager = /** @class */ (function () {
                                     ];
                                 case 1:
                                     // Load the stackoverflow user object
-                                    _a.stackoverflowUserObject = _g.sent();
+                                    _a.stackoverflowUserObject = _h.sent();
                                     // Get all answers of the user
                                     _b = user;
                                     return [4 /*yield*/, UserManager.getAnswersOfUser(user.stackoverflowUserObject, 1)
@@ -74,36 +74,40 @@ var UserManager = /** @class */ (function () {
                                     ];
                                 case 2:
                                     // Get all answers of the user
-                                    _b.stackoverflowAnswers = _g.sent();
+                                    _b.stackoverflowAnswers = _h.sent();
                                     // Get all the reputation changes of the user
                                     _c = user;
                                     return [4 /*yield*/, UserManager.getStatsOfUser(user.stackoverflowUserObject, 1)];
                                 case 3:
                                     // Get all the reputation changes of the user
-                                    _c.stackoverflowStats = _g.sent();
+                                    _c.stackoverflowStats = _h.sent();
                                     _d = user;
-                                    return [4 /*yield*/, UserManager.getAnswersAfterDate(user.stackoverflowAnswers, UserManager.challangeStartDate)
+                                    return [4 /*yield*/, UserManager.getAnswersAfterDate(user.stackoverflowAnswers, UserManager.challangeStartDate)];
+                                case 4:
+                                    _d.viableStackoverflowAnswers = _h.sent();
+                                    _e = user;
+                                    return [4 /*yield*/, UserManager.getAnswersBeforeDate(user.viableStackoverflowAnswers, new Date())
                                         // Get all the stats that are viable for the challenge
                                     ];
-                                case 4:
-                                    _d.viableStackoverflowAnswers = _g.sent();
-                                    // Get all the stats that are viable for the challenge
-                                    _e = user;
-                                    return [4 /*yield*/, UserManager.getStatsRelatedToAnswers(user.viableStackoverflowAnswers, user.stackoverflowStats)];
                                 case 5:
+                                    _e.viableStackoverflowAnswers = _h.sent();
                                     // Get all the stats that are viable for the challenge
-                                    _e.viableStackoverflowStats = _g.sent();
                                     _f = user;
-                                    return [4 /*yield*/, UserManager.calculatePointsOfUser(user)];
+                                    return [4 /*yield*/, UserManager.getStatsRelatedToAnswers(user.viableStackoverflowAnswers, user.stackoverflowStats)];
                                 case 6:
-                                    _f.calculatedPoints = _g.sent();
-                                    resolve(user);
-                                    return [3 /*break*/, 8];
+                                    // Get all the stats that are viable for the challenge
+                                    _f.viableStackoverflowStats = _h.sent();
+                                    _g = user;
+                                    return [4 /*yield*/, UserManager.calculatePointsOfUser(user)];
                                 case 7:
-                                    exception_1 = _g.sent();
+                                    _g.calculatedPoints = _h.sent();
+                                    resolve(user);
+                                    return [3 /*break*/, 9];
+                                case 8:
+                                    exception_1 = _h.sent();
                                     reject(exception_1);
-                                    return [3 /*break*/, 8];
-                                case 8: return [2 /*return*/];
+                                    return [3 /*break*/, 9];
+                                case 9: return [2 /*return*/];
                             }
                         });
                     }); })];
@@ -138,6 +142,16 @@ var UserManager = /** @class */ (function () {
             });
         });
     };
+    UserManager.getStatsBeforeDate = function (stackoverflowStats, compareDate) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, stackoverflowStats.filter(function (stat) {
+                        var tempDate = new Date(stat.on_date * 1000);
+                        return tempDate <= compareDate;
+                    })];
+            });
+        });
+    };
     UserManager.getStatsAfterDate = function (stackoverflowStats, compareDate) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -150,22 +164,49 @@ var UserManager = /** @class */ (function () {
     };
     UserManager.getStatsOfUser = function (stackoverflowUserObject, page) {
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        if (stackoverflowUserObject == undefined)
-                            reject();
-                        $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/reputation?page=" + page + "&pagesize=100&site=stackoverflow", {
-                            dataType: 'json',
-                            error: function (msg) {
-                                reject(msg);
-                            },
-                            success: function (data) {
-                                if (data.backoff != undefined)
-                                    UserManager.sleepBecauseStackoverflowLimits(data.backoff);
-                                resolve(data.items);
-                            },
-                            type: 'GET'
+            var prom, data, arr, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        prom = new Promise(function (resolve, reject) {
+                            if (stackoverflowUserObject == undefined)
+                                reject();
+                            $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/reputation?page=" + page + "&pagesize=100&site=stackoverflow", {
+                                dataType: 'json',
+                                error: function (msg) {
+                                    reject(msg);
+                                },
+                                success: function (data) {
+                                    resolve(data);
+                                },
+                                type: 'GET'
+                            });
                         });
+                        return [4 /*yield*/, prom];
+                    case 1:
+                        data = _c.sent();
+                        console.log("In user " + stackoverflowUserObject.user_id + " with page " + page);
+                        console.log(data.items);
+                        arr = data.items.slice();
+                        if (data.backoff != undefined)
+                            UserManager.sleepBecauseStackoverflowLimits(data.backoff);
+                        if (!data.has_more) return [3 /*break*/, 3];
+                        _b = (_a = arr).concat;
+                        return [4 /*yield*/, UserManager.getStatsOfUser(stackoverflowUserObject, ++page)];
+                    case 2:
+                        arr = _b.apply(_a, [_c.sent()]);
+                        _c.label = 3;
+                    case 3: return [2 /*return*/, arr];
+                }
+            });
+        });
+    };
+    UserManager.getAnswersBeforeDate = function (stackoverflowAnswers, compareDate) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, stackoverflowAnswers.filter(function (answer) {
+                        var tempDate = new Date(answer.creation_date * 1000);
+                        return tempDate <= compareDate;
                     })];
             });
         });
@@ -182,25 +223,40 @@ var UserManager = /** @class */ (function () {
     };
     UserManager.getAnswersOfUser = function (stackoverflowUserObject, page) {
         return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                return [2 /*return*/, new Promise(function (resolve, reject) {
-                        if (stackoverflowUserObject == undefined)
-                            reject();
-                        $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/answers?page=" + page + "&pagesize=100&order=desc&sort=creation&site=stackoverflow", {
-                            dataType: 'json',
-                            error: function (msg) {
-                                reject(msg);
-                            },
-                            success: function (data) {
-                                if (data.backoff != undefined)
-                                    UserManager.sleepBecauseStackoverflowLimits(data.backoff);
-                                /*if(data.has_more)
-                                    data.items = data.items.concat(await this.getAnswersOfUser(stackoverflowUserObject, page + 1));*/
-                                return resolve(data.items);
-                            },
-                            type: 'GET'
+            var prom, data, arr, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        prom = new Promise(function (resolve, reject) {
+                            if (stackoverflowUserObject == undefined)
+                                reject();
+                            $.ajax("https://api.stackexchange.com/2.2/users/" + stackoverflowUserObject.user_id + "/answers?page=" + page + "&pagesize=100&order=desc&sort=creation&site=stackoverflow", {
+                                dataType: 'json',
+                                error: function (msg) {
+                                    reject(msg);
+                                },
+                                success: function (data) {
+                                    return resolve(data);
+                                },
+                                type: 'GET'
+                            });
                         });
-                    })];
+                        return [4 /*yield*/, prom];
+                    case 1:
+                        data = _c.sent();
+                        console.log("In user " + stackoverflowUserObject.user_id + " with page " + page);
+                        console.log(data.items);
+                        arr = data.items.slice();
+                        if (data.backoff != undefined)
+                            UserManager.sleepBecauseStackoverflowLimits(data.backoff);
+                        if (!data.has_more) return [3 /*break*/, 3];
+                        _b = (_a = arr).concat;
+                        return [4 /*yield*/, UserManager.getAnswersOfUser(stackoverflowUserObject, ++page)];
+                    case 2:
+                        arr = _b.apply(_a, [_c.sent()]);
+                        _c.label = 3;
+                    case 3: return [2 /*return*/, arr];
+                }
             });
         });
     };

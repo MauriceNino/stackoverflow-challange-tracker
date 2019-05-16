@@ -28,6 +28,7 @@ class UserManager {
 				user.stackoverflowStats = await UserManager.getStatsOfUser(user.stackoverflowUserObject, 1)
 	
 				user.viableStackoverflowAnswers = await UserManager.getAnswersAfterDate(user.stackoverflowAnswers, UserManager.challangeStartDate)
+				user.viableStackoverflowAnswers = await UserManager.getAnswersBeforeDate(user.viableStackoverflowAnswers, new Date())
 
 				// Get all the stats that are viable for the challenge
 				user.viableStackoverflowStats = await UserManager.getStatsRelatedToAnswers(
@@ -68,6 +69,13 @@ class UserManager {
 
 	}	
 
+	public static async getStatsBeforeDate (stackoverflowStats: IStat[], compareDate: Date) {
+		return stackoverflowStats.filter((stat: IStat) => {
+			let tempDate = new Date(stat.on_date * 1000)
+			return tempDate <= compareDate
+		})
+	}
+
 	public static async getStatsAfterDate (stackoverflowStats: IStat[], compareDate: Date) {
 		return stackoverflowStats.filter((stat: IStat) => {
 			let tempDate = new Date(stat.on_date * 1000)
@@ -76,7 +84,7 @@ class UserManager {
 	}
 	
 	public static async getStatsOfUser (stackoverflowUserObject: IStackoverflowUser, page: number): Promise<IStat[]> {
-		return new Promise<IStat[]> ((resolve, reject) => {
+		let prom = new Promise<any> ((resolve, reject) => {
 			if(stackoverflowUserObject == undefined) reject()
 				
 			$.ajax(`https://api.stackexchange.com/2.2/users/${stackoverflowUserObject.user_id}/reputation?page=${page}&pagesize=100&site=stackoverflow`,
@@ -86,12 +94,32 @@ class UserManager {
 					reject(msg)
 				},
 				success: (data) => {
-					if(data.backoff != undefined)
-						UserManager.sleepBecauseStackoverflowLimits(data.backoff)
-					resolve(data.items)
+					resolve(data)
 				},
 				type: 'GET'
 			})
+		})
+
+		let data = await prom
+
+		console.log(`In user ${stackoverflowUserObject.user_id} with page ${page}`)
+		console.log(data.items)
+
+		let arr: IStat[] = data.items.slice()
+
+		if(data.backoff != undefined)
+			UserManager.sleepBecauseStackoverflowLimits(data.backoff)
+
+		if(data.has_more)
+			arr = arr.concat(await UserManager.getStatsOfUser(stackoverflowUserObject, ++page))
+
+		return arr
+	}
+
+	public static async getAnswersBeforeDate (stackoverflowAnswers: IAnswer[], compareDate: Date) {
+		return stackoverflowAnswers.filter((answer: IAnswer) => {
+			let tempDate = new Date(answer.creation_date * 1000)
+			return tempDate <= compareDate
 		})
 	}
 	
@@ -103,7 +131,7 @@ class UserManager {
 	}
 
 	public static async getAnswersOfUser (stackoverflowUserObject: IStackoverflowUser, page: number): Promise<IAnswer[]> {
-		return new Promise<IAnswer[]> ((resolve, reject) => {
+		let prom = new Promise<any> ((resolve, reject) => {
 			if(stackoverflowUserObject == undefined) reject()
 				
 			$.ajax(`https://api.stackexchange.com/2.2/users/${stackoverflowUserObject.user_id}/answers?page=${page}&pagesize=100&order=desc&sort=creation&site=stackoverflow`,
@@ -113,15 +141,26 @@ class UserManager {
 					reject(msg)
 				},
 				success: (data) => {
-					if(data.backoff != undefined)
-						UserManager.sleepBecauseStackoverflowLimits(data.backoff)
-					/*if(data.has_more)
-						data.items = data.items.concat(await this.getAnswersOfUser(stackoverflowUserObject, page + 1));*/
-					return resolve(data.items);
+					return resolve(data);
 				},
 				type: 'GET'
 			})
 		})
+
+		let data = await prom
+
+		console.log(`In user ${stackoverflowUserObject.user_id} with page ${page}`)
+		console.log(data.items)
+
+		let arr: IAnswer[] = data.items.slice()
+
+		if(data.backoff != undefined)
+			UserManager.sleepBecauseStackoverflowLimits(data.backoff)
+
+		if(data.has_more)
+			arr = arr.concat(await UserManager.getAnswersOfUser(stackoverflowUserObject, ++page))
+
+		return arr
 	}
 	
 	public static async getStackoverflowUser (user: User): Promise<IStackoverflowUser> {
