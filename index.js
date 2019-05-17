@@ -4,7 +4,8 @@ var users = [
     new User("Thomas Herzog"),
     new User("Erhard Siegl"),
     new User("Wirnse"),
-    new User("patrick.holzer")
+    new User("patrick.holzer"),
+    new User("meaningqo")
 ];
 $(document).ready(function () {
     var today = new Date();
