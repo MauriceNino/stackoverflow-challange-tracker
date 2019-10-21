@@ -6,7 +6,7 @@ let users: User[] = [
     new User("Wirnse"),
     new User("patrick.holzer"),
     new User("meaningqo"),
-    new User("ClemensKaserer")
+    new User("Clemens Kaserer")
 ]
 
 $(document).ready(() => { 
