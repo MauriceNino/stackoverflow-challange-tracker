@@ -6,7 +6,7 @@ var users = [
     new User("Wirnse"),
     new User("patrick.holzer"),
     new User("meaningqo"),
-    new User("Clemens Kaserer")
+    new User("ClemensKaserer")
 ];
 $(document).ready(function () {
     var today = new Date();
