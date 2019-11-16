@@ -42,7 +42,7 @@ $(document).ready(() => {
 
 function updateChart() {
     $('#myChart').remove()
-    $('#chartWrapper').append('<canvas id="myChart" height="60%"></canvas>')
+    $('#chartWrapper').append('<canvas id="myChart" height="80%"></canvas>')
     let startDate: Date = new Date(<string>$("#fromDate").val())
     let endDate: Date = new Date(<string>$("#toDate").val())
 

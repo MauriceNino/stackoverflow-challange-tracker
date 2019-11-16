@@ -38,7 +38,7 @@ $(document).ready(function () {
 });
 function updateChart() {
     $('#myChart').remove();
-    $('#chartWrapper').append('<canvas id="myChart" height="60%"></canvas>');
+    $('#chartWrapper').append('<canvas id="myChart" height="80%"></canvas>');
     var startDate = new Date($("#fromDate").val());
     var endDate = new Date($("#toDate").val());
     Chart.defaults.line.spanGaps = true;

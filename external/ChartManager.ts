@@ -27,9 +27,13 @@ class ChartManager {
         let sum: number = 0
         user.viableStackoverflowStats.slice().reverse().forEach((stat)=>{
             let statDate: Date = new Date(stat.on_date * 1000)
-            sum += stat.reputation_change
             let insertIndex: number = this.chart.data.labels.indexOf(this.getDateString(statDate))
-            dataSet.data.splice(insertIndex, 1, sum)
+            
+            if(insertIndex !== -1) {
+                sum += stat.reputation_change
+                dataSet.data.splice(insertIndex, 1, sum)
+            }
+
         })
         if(isNaN(dataSet.data[0]))
             dataSet.data.splice(0, 1, 0)

@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/MauriceNino/StackoverflowChallengeTracker/issues"
   },
-  "homepage": "https://github.com/MauriceNino/StackoverflowChallengeTracker#readme"
+  "homepage": "https://github.com/MauriceNino/StackoverflowChallengeTracker#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0"
+  }
 }
